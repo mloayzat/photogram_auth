@@ -1,7 +1,7 @@
 
 <div class="row">
   <div class="col-md-8 col-md-offset-2">
-                  <% @user.liked_photos.each do |liked_photo| %>
+                  <% @user.liked_photos.order(created_at: :desc ).each do |liked_photo| %>
     <div class="panel panel-default">
       <div class="panel-heading">
         <h3 class="panel-title">
@@ -18,14 +18,17 @@
             <img src="<%= liked_photo.image %>" class="img-responsive"></img>
             </a>
             <p>
-          </div>
-
-        </h3>
-        </div>
-
+          
+ 
         <%if liked_photo.likes.find_by(user_id: current_user.id).present?%> <a href="/delete_like/<%=liked_photo.likes.find_by(user_id: current_user.id).id%>" class="btn btn-link">
-              <i class="fa fa-heart"></i></a>  </p>
-            <%else%> <form action="/create_like" method="post">
+              <i class="fa fa-heart"></i></a>
+              <% usernames = [] %>
+              <% liked_photo.likes.each do |like| %>
+              <% usernames.push(like.user.username) %>
+              <% end %>
+              <%= usernames.to_sentence %> likes this  </p>
+            <%else%> <form action="/create_like" method="post" class="btn btn-link">
+             
               <!-- Hidden input for authenticity token to protect from forgery -->
               <input name="authenticity_token" type="hidden" value="zRlazHt8GN+4A38PT4aD0tFfbVBcfEuUiGU0xZT8I5/LDLwN9u8kA8VE62x9iLHnyzBV82TxpMM0yx/fVyB6SQ==">
 
@@ -34,9 +37,17 @@
               <input type="hidden" name="user_id" value="<%=current_user.id%>">
 
               <button class="btn btn-link">
-                <i class="fa fa-heart-o"></i>
+                
+             <i class="fa fa-heart-o"></i>
+
               </button>
+
               </form>
+                            <% usernames = [] %>
+              <% liked_photo.likes.each do |like| %>
+              <% usernames.push(like.user.username) %>
+              <% end %>
+              <%= usernames.to_sentence %> likes this
             <%end%>
 
                <ul class="media-list">

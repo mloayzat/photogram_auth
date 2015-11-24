@@ -21,12 +21,12 @@
 
 <div class="row">
   <div class="col-md-8 col-md-offset-2">
-                  <% @user.photos.each do |photo| %>
+                  <% @user.photos.order(created_at: :desc ).each do |photo| %>
     <div class="panel panel-default">
       <div class="panel-heading">
         <h3 class="panel-title">
 
-          <a href="/users/3"><%= @user.username%> </a>
+          <a href="/users/<%= photo.user.id%>"><%= @user.username%> </a>
           <small>
             <%= time_ago_in_words(photo.created_at)%> ago
           </small>
@@ -34,13 +34,83 @@
       </div>
 
       <div class="panel-body">
+         <a href="/photos/<%=photo.id%>"> 
             <img src="<%= photo.image %>" class="img-responsive"></img>
-          </div>
+                 </a>
+        <p>
 
-        </h3>
-        </div>
-             <% end %>
 
-       
-        </h3>
-      </div>
+       <%if photo.likes.find_by(user_id: current_user.id).present?%> <a href="/delete_like/<%=photo.likes.find_by(user_id: current_user.id).id%>" class="btn btn-link">
+              <i class="fa fa-heart"></i></a>
+              <% usernames = [] %>
+              <% photo.likes.each do |like| %>
+              <% usernames.push(like.user.username) %>
+              <% end %>
+              <%= usernames.to_sentence %> likes this  </p>
+            <%else%> <form action="/create_like" method="post" class="btn btn-link">
+             
+              <!-- Hidden input for authenticity token to protect from forgery -->
+              <input name="authenticity_token" type="hidden" value="zRlazHt8GN+4A38PT4aD0tFfbVBcfEuUiGU0xZT8I5/LDLwN9u8kA8VE62x9iLHnyzBV82TxpMM0yx/fVyB6SQ==">
+
+              <input type="hidden" name="photo_id" value="<%=photo.id%>">
+
+              <input type="hidden" name="user_id" value="<%=current_user.id%>">
+
+              <button class="btn btn-link">
+                
+             <i class="fa fa-heart-o"></i>
+
+              </button>
+
+              </form>
+                            <% usernames = [] %>
+              <% photo.likes.each do |like| %>
+              <% usernames.push(like.user.username) %>
+              <% end %>
+              <%= usernames.to_sentence %> likes this
+            <%end%>
+
+               <ul class="media-list">
+          <% photo.comments.each do |comment| %>
+          <li class="media">
+            <div class="media-body">
+              <h6 class="media-heading">
+                <a href="/users/<%=comment.user.id%>"><%= comment.user.username%></a>
+                <small>
+                  <%= time_ago_in_words(comment.created_at)%> ago
+                </small>
+              </h6>
+              <%= comment.body%>
+            </div>
+          </li>
+          <% end %>
+          <li class="media">
+            <div class="media-body">
+              <form action="/create_comment" method="post">
+                <!-- Hidden input for authenticity token to protect from forgery -->
+                <input name="authenticity_token" type="hidden" value="PcjSkRjrAX9TV0aPVelmMgF3vF9I1UBnGvPRL18P7jz8YCwQ2DZyGnSfTBL8Jlr4Q3vKmuSs/Gh/s5PY2caTIw==">
+
+                <input type="hidden" name="photo_id" value="<%=photo.id%>">
+
+                <input type="hidden" name="user_id" value="<%=current_user.id%>">
+
+                <!-- Label and input for body -->
+                <div class="form-group">
+                  <label for="body" class="sr-only">
+                    Body
+                  </label>
+
+                  <input type="text" id="body" name="body" placeholder="Add a comment..." class="form-control" required>
+                </div>
+              </form>
+            </div>
+          </li>
+          </ul>
+    </table>
+
+  </div>
+
+</div>
+<% end %>
+</h3>
+</div>

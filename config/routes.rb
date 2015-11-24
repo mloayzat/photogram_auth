@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  devise_for :views
   # Routes for the Comment resource:
   root "photos#index"
 
